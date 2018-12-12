@@ -14,7 +14,8 @@ const baseConfig = {
     path: path.resolve(__dirname, 'dist'),
     library: 'Parallax',
     libraryTarget: 'umd',
-    libraryExport: 'default'
+    libraryExport: 'default',
+    publicPath: '/'
   },
   module: {
     rules: [
@@ -24,6 +25,22 @@ const baseConfig = {
         use: {
           loader: 'babel-loader'
         }
+      },
+      {
+        test: /\.(png|jpg|jpeg|gif)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 1000,
+              name: 'public/[name].[ext]?[hash:7]'
+            }
+          }
+        ]
+      },
+      {
+        test: /\.html$/,
+        loader: 'html-loader'
       }
     ]
   },
@@ -32,19 +49,26 @@ const baseConfig = {
       hash: true,
       template: './index.html',
       filename: 'index.html'
-    }),
-    new CleanWebpackPlugin('dist')
+    })
   ]
 };
 
 const devConfig = {
   devServer: {
     contentBase: path.resolve(__dirname, 'dist'),
+    publicPath: '/',
     compress: true,
     port: 8080,
     inline: true,
     open: true
   }
+};
+
+const prodConfig = {
+  devtool: 'source-map',
+  plugins: [
+    new CleanWebpackPlugin('dist')
+  ]
 };
 
 module.exports = (env, argv) => {
@@ -53,5 +77,9 @@ module.exports = (env, argv) => {
   if (mode === 'development') {
     return merge({ mode: mode }, baseConfig, devConfig);
   }
+
+  if (mode === 'production') {
+    return merge({ mode: mode }, baseConfig, prodConfig);
+  } 
 }
 
