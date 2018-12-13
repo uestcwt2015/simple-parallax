@@ -3,9 +3,6 @@
  */
 
 import * as type from './type-validation';
-const i = require('../public/img.jpg')
-
-console.log(i);
 
 function Parallax(target, opts = {}) {
   const _target = target;
@@ -14,11 +11,12 @@ function Parallax(target, opts = {}) {
   const _bgPosition = type.isValidObject(opts.bgPosition) ? opts.bgPosition : {};
   const _speed = type.isValidNumber(opts.speed) ? opts.speed : 1;
   const _height = type.isValidNumber(opts.height) ? opts.height : 0;
+  let _image = null;
 
   const _initStyle = {
     width: '100%',
     height: _height + 'px',
-    position: 'absoluted',
+    position: 'absolute',
     zIndex: -100,
     overflow: 'hidden',
     transform: 'translate3d(0, 0, 0)',
@@ -27,11 +25,11 @@ function Parallax(target, opts = {}) {
   };
 
   const _imgStyle = {
-    position: 'absoluted',
+    position: 'absolute',
     overflow: 'hidden',
     transform: 'translate3d(0, 0, 0)',
-    left: _bgPosition.left + 'px',
-    top: _bgPosition.top + 'px'
+    left: _bgPosition.left || 0 + 'px',
+    top: _bgPosition.top || 0 + 'px'
   }
 
   /**
@@ -53,18 +51,53 @@ function Parallax(target, opts = {}) {
       _target.style[name] = _initStyle[name];
     });
 
-    let img = _createImgNode();
-    _target.appendChild(img);
+    _image = _createImgNode();
+    _target.appendChild(_image);
   }
 
   /** 
    * @func _initEvent
    * @desc add scroll listen handler on target 
+   * @return Null
    */
 
   function _initEvent() {
     const scrollParent = _getScrollParent(_target);
-    console.log(scrollParent);
+    const viewportHeight = scrollParent.clientHeight;
+    let prevScrollTop = 0;
+    scrollParent.addEventListener('scroll', () => {
+      const visable = _isVisiable(viewportHeight);
+      const scrollTop = scrollParent.scrollTop;
+
+      if (visable) {
+        _parallaxHandle(prevScrollTop, scrollTop);
+      }
+
+      prevScrollTop = scrollTop;
+    })
+  }
+
+  /** 
+   * @func _parallaxHandle
+   * @desc scroll handler
+   * @param Number prevScrollTop
+   * @param Number scrollTop
+   * @return Null
+  */
+
+  function _parallaxHandle(prevScrollTop, scrollTop) {
+    if (_speed === 1) return;
+    const diff = scrollTop - prevScrollTop;
+    const targetTop = parseInt(_target.style.top);
+    const imageTop = parseInt(_image.style.top);
+    const imgHeight = _image.clientHeight;
+    
+    const newImageTop = imageTop - _speed * diff;
+    if (newImageTop <= 0 && newImageTop >= (_height - imgHeight)) {
+      _image.style.top = newImageTop + 'px';
+    }
+    // _target.style.top = targetTop - diff + 'px';
+   
   }
 
   /**
@@ -100,7 +133,6 @@ function Parallax(target, opts = {}) {
     }
 
     return _getScrollParent(parent);
-
   }
 
   /**
@@ -117,13 +149,16 @@ function Parallax(target, opts = {}) {
 
   /**
    * @func _isVisiable
-   * @desc 
+   * @desc check target position
+   * @param Number viewportHeight
+   * @return Boolean
    */
 
-  function _isVisiable() {
+  function _isVisiable(viewportHeight) {
     const rect = _target.getBoundingClientRect();
-    const { top, left, bottom, right } = rect;
-    console.log(top, left, bottom, right);
+    const { top } = rect;
+
+    return top < viewportHeight-_height && top > 0
   }
 
   /** 

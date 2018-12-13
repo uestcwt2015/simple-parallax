@@ -14,14 +14,16 @@
       height: 150px;
       border: 1px solid;
       margin-bottom: 10px;
+      background: #fff;
     }
 
-    /* .container {
+    .container {
+      overflow: scroll;
+      height: 100vh;
+    }
+    /* body {
       overflow: scroll;
     } */
-    body {
-      overflow: scroll;
-    }
   </style>
 </head>
 <body>
@@ -29,7 +31,12 @@
     <div class="block"></div>
     <div class="block"></div>
     <div class="block"></div>
-    <div id="demo"></div>
+    <div class="block"></div>
+    <div class="block"></div>
+    <div class="demo-container" style="position: relative; height: 300px">
+      <div id="demo"></div>
+    </div>
+    <div class="block"></div>
     <div class="block"></div>
     <div class="block"></div>
     <div class="block"></div>
@@ -42,7 +49,8 @@
     Parallax(demo, {
       height: 300,
       top: 0,
-      bgSrc: "/public/img.jpg"
+      bgSrc: "/public/img.jpg",
+      speed: 0.9
     });
   }
 </script>
