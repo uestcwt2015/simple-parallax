@@ -56,6 +56,7 @@ const devConfig = {
     contentBase: path.resolve(__dirname, 'dist'),
     publicPath: '/',
     compress: true,
+    host: '0.0.0.0',
     port: 8080,
     inline: true,
     open: true
